@@ -25,3 +25,20 @@ The **Intelligent Excuse Generator** is a fun and smart web application that cre
 ```bash
 git clone https://github.com/TejasriNarayanapurapu/intelligent-excuse-generator.git
 cd intelligent-excuse-generator
+
+
+Install dependencies
+
+bash
+Copy
+Edit
+pip install -r requirements.txt
+Run the app
+
+bash
+Copy
+Edit
+python app.py
+Open in browser
+
+Visit http://127.0.0.1:5000

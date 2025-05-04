@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+<head><title>Excuse History</title></head>
+<body>
+<h1>🕒 Your Excuse History</h1>
+
+{% if history %}
+    <ul>
+    {% for item in history %}
+        <li>
+            {{ item }}
+            {% if item not in favorites %}
+                <form action="{{ url_for('favorite') }}" method="post" style="display:inline;">
+                    <input type="hidden" name="excuse" value="{{ item }}">
+                    <button type="submit">⭐ Add to Favorites</button>
+                </form>
+            {% else %}
+                <span>⭐ Favorited</span>
+            {% endif %}
+        </li>
+    {% endfor %}
+    </ul>
+{% else %}
+    <p>No excuses generated yet!</p>
+{% endif %}
+
+<a href="{{ url_for('index') }}">⬅ Back</a>
+</body>
+</html>

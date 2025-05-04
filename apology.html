@@ -1,0 +1,74 @@
+!-- templates/apology.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Apology Generator</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <h1>😢 Guilt-Tripping Apology Generator</h1>
+        <p style="color: green;">Template loaded ✅</p>
+
+
+        <form method="POST" action="/apology">
+            <label>Choose a scenario:</label>
+            <select name="scenario" required>
+                <option value="Work">Work</option>
+                <option value="School">School</option>
+                <option value="Social">Social</option>
+                <option value="Family">Family</option>
+            </select>
+
+            <label>Pick a tone (optional):</label>
+            <select name="tone">
+                <option value="sincere">Sincere</option>
+                <option value="emotional">Emotional</option>
+                <option value="dramatic">Dramatic</option>
+            </select>
+
+            <button type="submit">Generate Apology</button>
+        </form>
+        {% if apology %}
+        <h2>Your Apology:</h2>
+        <p id="apologyText">{{ apology }}</p>
+        <button onclick="speakApology()">🔊 Play Apology</button>
+        <script>
+            function speakApology() {
+                var apologyText = document.getElementById('apologyText').innerText;
+                var utterance = new SpeechSynthesisUtterance(apologyText);
+                utterance.lang = 'en-US';
+                window.speechSynthesis.speak(utterance);
+            };
+            
+            </script>   
+    {% endif %}
+
+    <p><a href="{{ url_for('index') }}">Back to Excuse Generator</a></p>
+
+    <script>
+        function startVoiceInput(fieldName) {
+            const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+            recognition.lang = 'en-US';
+            recognition.start();
+
+            recognition.onresult = function(event) {
+                const result = event.results[0][0].transcript.toLowerCase();
+                document.querySelectorAll(`input[name="${fieldName}"]`).forEach(radio => {
+                    if (radio.value.toLowerCase() === result) {
+                        radio.checked = true;
+                    }
+                });
+            };
+        }
+    </script>
+        
+</body>
+</html>
+
+
+
+
+

@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="{{ language_dict['lang'] }}">
+<head>
+    <meta charset="UTF-8">
+    <title>{{ language_dict['excuse_header'] }} 🎙️</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <style>
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background-color: #edf2fa;
+            color: #333;
+            padding: 20px;
+            max-width: 800px;
+            margin: auto;
+        }
+        h1, h2, h3 {
+            color: #2c3e50;
+        }
+        form {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            margin-bottom: 20px;
+        }
+        label {
+            font-weight: bold;
+            display: block;
+            margin-top: 15px;
+        }
+        select, input[type="radio"] {
+            margin-top: 5px;
+        }
+        input[type="submit"], button {
+            margin-top: 20px;
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 18px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+        input[type="submit"]:hover, button:hover {
+            background-color: #45a049;
+        }
+        .proof-img {
+            max-width: 400px;
+            margin-top: auto;
+            border-radius: 10px;
+            box-shadow: 0 0 8px rgba(0,0,0,0.1);
+        }
+        ol {
+            padding-left: 0;
+        }
+        li {
+            margin: 10px 0;
+        }
+        a {
+            text-decoration: none;
+            color: #0077cc;
+        }
+        a:hover {
+            text-decoration: underline;
+        }
+        .prediction-box {
+            background-color: #eef;
+            padding: 12px;
+            border-radius: 10px;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+
+    <h1>{{ language_dict['excuse_header'] }}</h1>
+    <p>{{ language_dict['excuse_intro'] }}</p>
+
+    <form method="post">
+        <label>{{ language_dict['choose_scenario'] }}:</label>
+        <select name="scenario">
+            <option value="Work" {% if request.form.get('scenario') == 'Work' %}selected{% endif %}>{{ language_dict['work'] }}</option>
+            <option value="School" {% if request.form.get('scenario') == 'School' %}selected{% endif %}>{{ language_dict['school'] }}</option>
+            <option value="Social" {% if request.form.get('scenario') == 'Social' %}selected{% endif %}>{{ language_dict['social'] }}</option>
+            <option value="Family" {% if request.form.get('scenario') == 'Family' %}selected{% endif %}>{{ language_dict['family'] }}</option>
+        </select>
+
+        <label>{{ language_dict['urgency'] }}:</label>
+        <input type="radio" name="urgency" value="Low" {% if request.form.get('urgency') == 'Low' %}checked{% endif %}> Low
+        <input type="radio" name="urgency" value="Medium" {% if request.form.get('urgency') == 'Medium' %}checked{% endif %}> Medium
+        <input type="radio" name="urgency" value="High" {% if request.form.get('urgency') == 'High' %}checked{% endif %}> High
+
+        <label>Select Language for Voice Output:</label>
+        <select name="language" id="language">
+            <option value="en-US" {% if selected_language == 'en-US' %}selected{% endif %}>English 🇺🇸</option>
+            <option value="hi-IN" {% if selected_language == 'hi-IN' %}selected{% endif %}>Hindi 🇮🇳</option>
+            <option value="te-IN" {% if selected_language == 'te-IN' %}selected{% endif %}>Telugu 🇮🇳</option>
+            <option value="es-ES" {% if selected_language == 'es-ES' %}selected{% endif %}>Spanish 🇪🇸</option>
+            <option value="fr-FR" {% if selected_language == 'fr-FR' %}selected{% endif %}>French 🇫🇷</option>
+        </select>
+
+        <input type="submit" value="{{ language_dict['generate_excuse'] }}">
+    </form>
+    </div>
+
+    {% if excuse %}
+        <h2>Your Excuse:</h2>
+        <p id="excuseText">{{ excuse }}</p>
+        <button onclick="speakExcuse()">🔊 Play Excuse</button>
+
+        <script>
+            function speakExcuse() {
+                const text = document.getElementById('excuseText').innerText;
+                const language = document.getElementById('language').value;
+                const utterance = new SpeechSynthesisUtterance(text);
+                utterance.lang = language;
+               
+                function loadAndSpeak() {
+            const voices = window.speechSynthesis.getVoices();
+            let matchedVoice = voices.find(voice => voice.lang === language);
+
+            // Telugu fallback
+            if (language === 'te-IN' && !matchedVoice) {
+                matchedVoice = voices.find(voice => voice.lang.startsWith('en'));
+                utterance.lang = 'en-US';
+                alert("⚠️ Telugu voice not supported on your browser. Using English voice instead.");
+            }
+
+            if (matchedVoice) {
+                utterance.voice = matchedVoice;
+            }
+
+            window.speechSynthesis.speak(utterance);
+        }
+
+        if (window.speechSynthesis.getVoices().length === 0) {
+            // Wait for voices to load
+            window.speechSynthesis.onvoiceschanged = loadAndSpeak;
+        } else {
+            loadAndSpeak();
+        }
+    }
+</script>
+
+       
+        </script>
+    {% endif %}
+
+    {% if proof %}
+        <h3>Fake Proof:</h3>
+        <img src="{{ proof }}" alt="Fake Proof" class="proof-img">
+    {% endif %}
+
+    {% if top_excuses %}
+        <h2>🏆 Top Excuses:</h2>
+        <ol>
+            {% for excuse in top_excuses %}
+                <li>
+                    {% if loop.index == 1 %}🥇{% elif loop.index == 2 %}🥈{% elif loop.index == 3 %}🥉{% endif %}
+                    <strong>{{ excuse }}</strong>
+                </li>
+            {% endfor %}
+        </ol>
+    {% endif %}
+
+    {% if predicted_schedule %}
+        <div class="prediction-box">
+            📅 <strong>Prediction:</strong> Based on your history, you may need your next excuse on: <strong>{{ predicted_schedule }}</strong>
+        </div>
+    {% endif %}
+
+    <p><a href="{{ url_for('apology') }}">💔 Generate a guilt-tripping apology</a></p>
+    <p><a href="{{ url_for('history') }}">🕒 View History and Favorites</a></p>
+
+</body>
+</html>
+
+
+
+
